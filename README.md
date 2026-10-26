@@ -2,7 +2,7 @@
 
 Gated **proposer** for the workbench. Writes the same job a human would submit. Does not execute.
 
-Pip name: **`neuroworkbench-proposer`**. No console command. No `neuroinsight-agent`.
+Pip name: **`nwproposer`**. No console command. No `neuroinsight-agent`.
 
 The shipping UI remains [neuroinsight_research](https://github.com/phindagijimana/neuroinsight_research). This repo does not vendor it. G is not a NeuroClaw wrap.
 

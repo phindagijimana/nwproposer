@@ -3,7 +3,7 @@ requires = ["setuptools>=65.5"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "neuroworkbench-proposer"
+name = "nwproposer"
 version = "0.1.0"
 description = "Proposer-only adapter for NeuroWorkbench. No execute. No neuroinsight-agent command."
 license = { text = "Apache-2.0" }
