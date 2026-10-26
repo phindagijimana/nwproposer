@@ -32,6 +32,7 @@ def research_stub_roots() -> tuple[Path, ...]:
         paper / "guards",
         paper / "adapters",
         paper / "baselines",
+        paper / "nwproposer",
     )
 
 

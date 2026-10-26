@@ -31,10 +31,21 @@ def test_sciguard_fail_labels_to_dwi_g_does_not_post(illegal_labels_t1w_on_dwi):
     assert poster.posts == []
 
 
+def test_scicap_abstain_space_omitted_g_does_not_post(illegal_space_omitted):
+    poster = PostRecorder()
+    result = submit(illegal_space_omitted, arm="G", approve=True, poster=poster)
+    assert result.scicap_decision == "ABSTAIN"
+    assert result.posted is False
+    assert result.reason == "scicap_abstain"
+    assert result.incorrect_submission is False
+    assert poster.posts == []
+    assert "space" not in (illegal_space_omitted.get("parameters") or {})
+
+
 def test_u_posts_illegal_jobs_g_does_not(
-    illegal_dk_as_dkt, illegal_labels_t1w_on_dwi
+    illegal_dk_as_dkt, illegal_labels_t1w_on_dwi, illegal_space_omitted
 ):
-    fixtures = [illegal_dk_as_dkt, illegal_labels_t1w_on_dwi]
+    fixtures = [illegal_dk_as_dkt, illegal_labels_t1w_on_dwi, illegal_space_omitted]
     g_results = []
     u_results = []
     for fixture in fixtures:
@@ -81,3 +92,4 @@ def test_item_score_matches_schema(illegal_dk_as_dkt):
     jsonschema.validate(record, schema)
     assert record["incorrect_submission"] is False
     assert record["posted"] is False
+    assert record["paper6_primary"] is False

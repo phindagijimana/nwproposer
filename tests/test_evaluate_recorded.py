@@ -21,6 +21,10 @@ def test_evaluate_recorded_is_paper3_secondary():
     assert score["false_success"] is True
     assert score["owner"] == "neuroagentbench"
     assert score["paper6_primary"] is False
+    # Even if Paper 3 later sets a primary flag, Paper 6 must overwrite it.
+    score["paper6_primary"] = True
+    again = evaluate_recorded(TASK, RUN)
+    assert again["paper6_primary"] is False
 
 
 def test_agent_tool_evaluate_recorded():

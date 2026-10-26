@@ -1,0 +1,17 @@
+# SciCap ABSTAIN fixture: space omitted. G must not POST / must not call workbench.
+# Do not fill space from a capability default (Paper 1 M2 / S0 missing_space).
+proposer: agent
+plugin_id: fastsurfer
+plugin_version: "2.4.2"
+image_digest: "sha256:PENDING"
+inputs:
+  T1w: "bids:sub-01/anat/sub-01_T1w.nii.gz"
+parameters:
+  subject_id: sub-01
+  modality: T1w
+  illegal_family: missing_space
+backend: local_docker
+network: off
+approval:
+  execution: true
+workflow: false

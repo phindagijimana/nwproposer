@@ -1,6 +1,7 @@
 """Dry-run submit through the public neuroworkbench kernel only if G gates pass.
 
-Arm G is not a NeuroClaw wrap. Arm U is an unconstrained stub that skips gates.
+Arm G is not a NeuroClaw wrap. REJECT / ABSTAIN / FAIL never reach neuroworkbench.
+Arm U is an unconstrained stub (not a NeuroClaw wrap) that skips gates.
 Kernel is neuroworkbench (Paper 5), not neuroinsight_research.
 """
 
@@ -52,8 +53,21 @@ class SubmitResult:
     execute_called: bool = False
 
 
+_BLOCKING_SCICAP = frozenset({"REJECT", "ABSTAIN"})
+_BLOCKING_SCIGUARD = frozenset({"FAIL"})
+
+
 def _illegal_for_score(scicap_decision: str, sciguard_status: str) -> bool:
-    return scicap_decision in {"REJECT", "ABSTAIN"} or sciguard_status == "FAIL"
+    return scicap_decision in _BLOCKING_SCICAP or sciguard_status in _BLOCKING_SCIGUARD
+
+
+def _gate_block_reason(scicap_decision: str, sciguard_status: str) -> str | None:
+    """Reason G/H must not hand this request to neuroworkbench, or None."""
+    if scicap_decision in _BLOCKING_SCICAP:
+        return f"scicap_{scicap_decision.lower()}"
+    if sciguard_status in _BLOCKING_SCIGUARD:
+        return "sciguard_fail"
+    return None
 
 
 def _modes() -> dict[str, str]:
@@ -91,6 +105,7 @@ def submit(
     modes = _modes()
 
     if arm == "U":
+        # Unconstrained stub: skip gates and the workbench kernel. Not NeuroClaw.
         job = to_job_payload(request, canonical=canonicalize(request))
         recorder.post(job)
         return SubmitResult(
@@ -102,28 +117,20 @@ def submit(
             incorrect_submission=illegal,
             job=job,
             guard_mode=modes,
+            workbench=None,
         )
 
-    if scicap_decision in {"REJECT", "ABSTAIN"}:
+    blocked = _gate_block_reason(scicap_decision, sciguard_status)
+    if blocked:
         return SubmitResult(
             arm=arm,
             posted=False,
-            reason=f"scicap_{scicap_decision.lower()}",
+            reason=blocked,
             scicap_decision=scicap_decision,
             sciguard_status=sciguard_status,
             incorrect_submission=False,
             guard_mode=modes,
-        )
-
-    if is_workflow(request) and sciguard_status == "FAIL":
-        return SubmitResult(
-            arm=arm,
-            posted=False,
-            reason="sciguard_fail",
-            scicap_decision=scicap_decision,
-            sciguard_status=sciguard_status,
-            incorrect_submission=False,
-            guard_mode=modes,
+            workbench=None,
         )
 
     if not approved or (review["requires_approve"] and not approve):
@@ -135,10 +142,10 @@ def submit(
             sciguard_status=sciguard_status,
             incorrect_submission=False,
             guard_mode=modes,
+            workbench=None,
         )
 
     job = to_job_payload(request, canonical=canonicalize(request))
-    recorder.post(job)
     workbench_result = None
     execute_called = False
     reason = "dry_run_existing_submit"
@@ -153,6 +160,7 @@ def submit(
                 incorrect_submission=False,
                 job=job,
                 guard_mode=modes,
+                workbench=None,
             )
         workbench_result = workbench_submit(
             request,
@@ -160,7 +168,6 @@ def submit(
             store=store or Path(".nwproposer_store"),
         )
         execute_called = bool(workbench_result.get("execute_called"))
-        reason = "dry_run_neuroworkbench"
         if workbench_result.get("status") == "rejected":
             return SubmitResult(
                 arm=arm,
@@ -174,6 +181,8 @@ def submit(
                 workbench=workbench_result,
                 execute_called=execute_called,
             )
+        reason = "dry_run_neuroworkbench"
+    recorder.post(job)
     return SubmitResult(
         arm=arm,
         posted=True,

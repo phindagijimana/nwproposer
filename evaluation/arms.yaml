@@ -7,11 +7,14 @@ arms:
   G:
     writer: gated_proposer
     gates: [scicap_invoke, sciguard_if_workflow, explicit_approval, neuroworkbench_submit]
+    neuroclaw_wrap: false
   U:
     writer: unconstrained_agent
     gates: []
     same_model_as_G: true
     tools_and_shell: allowed
+    neuroclaw_wrap: false
+    note: unconstrained stub; a NeuroClaw U clone is later and is not vendored here
 primary:
   - incorrect_submission_rate
   - job_equality_G_vs_H
@@ -21,5 +24,6 @@ secondary:
 illegal_fixtures:
   - shared/fixtures/invalid/dk_as_dkt
   - shared/fixtures/invalid/labels_t1w_on_dwi
+  - shared/fixtures/invalid/missing_space
 legal_fixtures:
   - shared/fixtures/valid

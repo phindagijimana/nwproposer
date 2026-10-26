@@ -41,7 +41,8 @@ def evaluate_recorded(
     evaluate_fn = _load_evaluate()
     if evaluate_fn is None:
         raise ImportError("neuroagentbench is not importable; install the public Paper 3 package")
-    score = evaluate_fn(task, run, seed=seed)
+    score = dict(evaluate_fn(task, run, seed=seed))
     score["owner"] = "neuroagentbench"
+    # Paper 3 owns this number. Never promote it to a Paper 6 primary.
     score["paper6_primary"] = False
     return score

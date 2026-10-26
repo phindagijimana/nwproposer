@@ -29,9 +29,11 @@ submit(req, arm="G", approve=True, kernel="workbench")
 # from nwproposer import evaluate_recorded
 ```
 
-G is blocked on SciCap REJECT, SciGuard FAIL, or missing approve. U skips gates (incorrect_submission). H/G must match on plugin, digest, inputs, backend, network.
+G is blocked on SciCap REJECT / ABSTAIN, SciGuard FAIL, or missing approve — those jobs are not handed to neuroworkbench. U skips gates (incorrect_submission) and is an unconstrained stub, not a NeuroClaw wrap. H/G must match on plugin, digest, inputs, backend, network.
 
-Public tools: SciCap, SciGuard, neuroworkbench, NeuroPilot approval list, CyberNeuro Planner ≠ Dispatcher. Not a NeuroClaw wrap.
+If a public T1w is already on disk under `shared/data/external` (not in git), a legal H/G FastSurfer job is pointed at that path and dry-run through neuroworkbench.submit. Pytest does not download. Annex pointers are treated as absent. When those bytes are absent, fixture jobs remain.
+
+Public tools: SciCap, SciGuard, neuroworkbench, NeuroPilot approval list, CyberNeuro Planner ≠ Dispatcher. No chat UI. Stub U-vs-G counts are not evaluation percentages.
 
 ```bash
 pytest tests

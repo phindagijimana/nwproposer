@@ -41,7 +41,9 @@ TOOLS: list[dict[str, Any]] = [
         "name": "submit",
         "description": (
             "Dry-run post of a proposed job through gates. "
-            "Does not execute. Arm G is fail-closed."
+            "Does not execute. Arm G is fail-closed: REJECT/ABSTAIN/FAIL "
+            "are not handed to neuroworkbench. Arm U is unconstrained, "
+            "not a NeuroClaw wrap."
         ),
         "inputSchema": {
             "type": "object",

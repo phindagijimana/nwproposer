@@ -36,6 +36,11 @@ def illegal_labels_t1w_on_dwi() -> dict:
 
 
 @pytest.fixture
+def illegal_space_omitted() -> dict:
+    return yaml.safe_load((FIXTURES / "illegal_space_omitted.yaml").read_text())
+
+
+@pytest.fixture
 def silent_success_receipt() -> dict:
     return yaml.safe_load((FIXTURES / "silent_success_receipt.yaml").read_text())
 

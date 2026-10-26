@@ -93,6 +93,22 @@ def test_labels_to_dwi_public_and_paper6(illegal_labels_t1w_on_dwi):
     assert poster.posts == []
 
 
+def test_space_omitted_public_and_paper6(illegal_space_omitted):
+    review = review_approval(illegal_space_omitted)
+    assert "space" not in review["triggers"]
+    assert review["requires_approve"] is False
+    protocol = dispatch(illegal_space_omitted)
+    assert protocol["executed"] is False
+
+    poster = PostRecorder()
+    result = submit(illegal_space_omitted, arm="G", approve=True, poster=poster)
+    assert result.scicap_decision == "ABSTAIN"
+    assert result.posted is False
+    assert result.reason == "scicap_abstain"
+    assert poster.posts == []
+    assert "space" not in (illegal_space_omitted.get("parameters") or {})
+
+
 def test_network_on_public_and_paper6(network_on_request):
     review = review_approval(network_on_request)
     assert review["requires_approve"] is True
@@ -139,9 +155,9 @@ def test_qc_skipped_is_paper5_n2_field_not_paper6_result(silent_success_receipt,
 
 
 def test_u_incorrect_submission_gt_g_is_stub_count_not_a_result(
-    illegal_dk_as_dkt, illegal_labels_t1w_on_dwi
+    illegal_dk_as_dkt, illegal_labels_t1w_on_dwi, illegal_space_omitted
 ):
-    fixtures = [illegal_dk_as_dkt, illegal_labels_t1w_on_dwi]
+    fixtures = [illegal_dk_as_dkt, illegal_labels_t1w_on_dwi, illegal_space_omitted]
     g_results = [submit(row, arm="G", approve=True, poster=PostRecorder()) for row in fixtures]
     u_results = [submit(row, arm="U", approve=True, poster=PostRecorder()) for row in fixtures]
     assert all(not row.posted for row in g_results)
@@ -150,7 +166,7 @@ def test_u_incorrect_submission_gt_g_is_stub_count_not_a_result(
     assert incorrect_submission_rate(u_results) > incorrect_submission_rate(g_results)
 
 
-def test_g_is_not_a_neuroclaw_wrap_on_public_and_stubs(paper_root):
+def test_g_is_not_a_neuroclaw_wrap_on_public_and_stubs(paper_root, arms):
     hits = forbidden_imports_found()
     claw = [
         hit
@@ -160,6 +176,9 @@ def test_g_is_not_a_neuroclaw_wrap_on_public_and_stubs(paper_root):
     assert claw == []
     submit_text = (paper_root / "proposer" / "submit.py").read_text()
     assert "not a NeuroClaw wrap" in submit_text
+    assert arms["G"]["neuroclaw_wrap"] is False
+    assert arms["U"]["neuroclaw_wrap"] is False
+    assert arms["U"]["writer"] == "unconstrained_agent"
 
 
 def test_a5_reuse_is_imports_not_reimplementation(paper_root):
@@ -182,3 +201,11 @@ def test_private_repo_and_neuroclaw_not_vendored(paper_root):
     for path in paper_root.rglob("*"):
         if path.is_dir() and path.name.lower() in _VENDORED_DIR_NAMES:
             raise AssertionError(f"vendored tree present: {path}")
+
+
+def test_readme_stays_propose_to_workbench(paper_root):
+    text = (paper_root / "README.md").read_text()
+    assert "from nwproposer import propose, submit" in text
+    assert 'kernel="workbench"' in text
+    assert "No chat UI" in text
+    assert "%" not in text

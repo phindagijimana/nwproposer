@@ -38,4 +38,6 @@ def item_score(
         "job_equal_to_human": job_equal_to_human,
         "platform_silent_success": platform_silent_success(receipt or {}),
         "scientific_valid_nab": (receipt or {}).get("scientific_valid"),
+        # Paper 3 owns scientific_valid. Never promote a stub score to Paper 6.
+        "paper6_primary": False,
     }

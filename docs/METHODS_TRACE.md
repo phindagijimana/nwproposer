@@ -83,7 +83,25 @@ Do not republish M1–M4, G1–G5, B1–B7, E1–E5, or N1–N6 as Paper 6 resul
 
 ## Wave 3 residual (protocol + stubs)
 
-Sibling `01_SciCap` / `02_SciGuard` are called on DK-as-DKT and labels→DWI when those packages import; otherwise guards stay recorded. FastAPI equality is a hand-authored product-shape contract (`fixtures/fastapi_fastsurfer_job.json`), not a clone. NeuroPilot still requires approve on `network: on`, overwrite, and backend switch. A1 still scans `baselines/` and `adapters/` for `backend.execution`. G is not NeuroClaw.
+Sibling `01_SciCap` / `02_SciGuard` are called on DK-as-DKT, omitted space (ABSTAIN), and labels→DWI when those packages import; otherwise guards stay recorded. G does not hand SciCap REJECT/ABSTAIN or SciGuard FAIL to the workbench kernel. FastAPI equality is a hand-authored product-shape contract (`fixtures/fastapi_fastsurfer_job.json`), not a clone. NeuroPilot still requires approve on `network: on`, overwrite, and backend switch. A1 still scans `baselines/` and `adapters/` for `backend.execution`. G is not NeuroClaw.
+
+---
+
+## Wave 4 residual (offline slice)
+
+G still must not hand REJECT / ABSTAIN / FAIL to `neuroworkbench` (`_gate_block_reason` returns before `workbench_submit`). Arm U stays an unconstrained stub (`neuroclaw_wrap: false`); a NeuroClaw U clone is later and is not vendored. `evaluate_recorded` stays Paper 3 secondary (`paper6_primary: false`). README stays propose → workbench. No chat UI. No fabricated U-vs-G percentages.
+
+---
+
+## Wave 5 residual (production-facing)
+
+Public OpenNeuro T1w bytes were **not** present under `shared/data/external/` (26 October 2026). Pytest does not download them (`shared/scripts/fetch_s0.py` requires `--i-accept-public-data`). Fixture jobs remain the G=H baseline. When those bytes exist, `proposer/external.py` points a neuroworkbench job at that path and asserts G=H; G still refuses illegal fixtures. No fabricated U-vs-G percentages. `proposer/__init__.py` does not import `submit` (avoids a circular import with `proposer.submit`).
+
+---
+
+## Wave 6 residual (S0 T1w on disk)
+
+Public OpenNeuro T1w bytes are now present under `shared/data/external/ds000003/` (26 October 2026) with gzip magic. They are not in git. `proposer/external.py` treats git-annex / LFS pointers as absent (require gzip magic and size >> 1 KB). A legal H/G FastSurfer job is pointed at that path and dry-run through `neuroworkbench.submit`. G still gate-blocks SciCap REJECT/ABSTAIN and SciGuard FAIL before the workbench. `evaluate_recorded` stays Paper 3 secondary (`paper6_primary: false`). No fabricated U-vs-G percentages. Still blocked: annotators, unconstrained NeuroClaw U clone, confirmatory tables, FastSurfer GPU, Slurm submit.
 
 ---
 

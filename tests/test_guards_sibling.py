@@ -41,3 +41,21 @@ def test_labels_to_dwi_calls_sibling_or_recorded_and_does_not_post(
     assert result.posted is False
     assert poster.posts == []
     assert result.guard_mode["sciguard"] in {"sibling", "recorded"}
+
+
+def test_space_omitted_calls_sibling_or_recorded_and_does_not_post(
+    illegal_space_omitted,
+):
+    decision = scicap_invoke(illegal_space_omitted)
+    assert decision == "ABSTAIN"
+    mode = scicap_mode()
+    assert mode in {"sibling", "recorded"}
+    if scicap_sibling():
+        assert mode == "sibling"
+    poster = PostRecorder()
+    result = submit(illegal_space_omitted, arm="G", approve=True, poster=poster)
+    assert result.scicap_decision == "ABSTAIN"
+    assert result.posted is False
+    assert poster.posts == []
+    assert result.guard_mode["scicap"] in {"sibling", "recorded"}
+    assert "space" not in (illegal_space_omitted.get("parameters") or {})

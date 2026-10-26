@@ -28,6 +28,9 @@ _SCICAP_CAPABILITY = (
 _SHARED_DK_AS_DKT = (
     _WORKSPACE / "shared" / "fixtures" / "invalid" / "dk_as_dkt" / "instance.json"
 )
+_SHARED_MISSING_SPACE = (
+    _WORKSPACE / "shared" / "fixtures" / "invalid" / "missing_space" / "instance.json"
+)
 
 _guard_mode = GUARD_MODE_RECORDED
 _sibling_invoke: Callable[..., Any] | None | bool = False
@@ -93,15 +96,23 @@ def _is_dk_as_dkt(request: Mapping[str, Any]) -> bool:
     return bool(declared and actual and declared != actual)
 
 
+def _is_space_omitted(request: Mapping[str, Any]) -> bool:
+    """True only for the locked omitted-space family — do not infer on legal stubs."""
+    parameters = request.get("parameters") or {}
+    if parameters.get("space_omitted") or parameters.get("illegal_family") == "missing_space":
+        return True
+    space = parameters.get("space")
+    return space in ("", "omitted", "missing")
+
+
 def _instance_for_request(request: Mapping[str, Any]) -> dict[str, Any] | Path:
     parameters = request.get("parameters") or {}
     inputs = request.get("inputs") or {}
     if _SHARED_DK_AS_DKT.is_file() and _is_dk_as_dkt(request):
         return _SHARED_DK_AS_DKT
-    space_omitted = bool(
-        parameters.get("space_omitted")
-        or parameters.get("illegal_family") == "missing_space"
-    )
+    space_omitted = _is_space_omitted(request)
+    if space_omitted and _SHARED_MISSING_SPACE.is_file():
+        return _SHARED_MISSING_SPACE
     instance: dict[str, Any] = {
         "modality": parameters.get("modality") or "T1w",
         "atlas": parameters.get("atlas_declared") or parameters.get("atlas"),
@@ -123,7 +134,7 @@ def _recorded_invoke(request: Mapping[str, Any]) -> str:
         return "REJECT"
     if parameters.get("wrong_modality"):
         return "REJECT"
-    if parameters.get("space_omitted") or parameters.get("illegal_family") == "missing_space":
+    if _is_space_omitted(request):
         return "ABSTAIN"
     return "ALLOW"
 

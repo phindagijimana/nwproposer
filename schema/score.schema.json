@@ -41,6 +41,11 @@
       "description": "Paper 3 score if evaluated; not this paper’s primary",
       "type": ["boolean", "null"]
     },
-    "time_to_valid_job_s": { "type": ["number", "null"] }
+    "time_to_valid_job_s": { "type": ["number", "null"] },
+    "paper6_primary": {
+      "description": "Always false. NeuroAgentBench scientific_valid is Paper 3, not this paper.",
+      "type": "boolean",
+      "const": false
+    }
   }
 }

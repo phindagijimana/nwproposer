@@ -12,6 +12,7 @@ from proposer.forbidden import (
     assert_execution_not_loaded,
     assert_no_forbidden_imports,
     forbidden_imports_found,
+    imported_module_names,
 )
 from proposer.propose import propose
 from proposer.submit import PostRecorder, submit
@@ -30,8 +31,13 @@ def test_proposer_source_has_no_forbidden_imports():
 
 
 def test_a1_scan_baselines_and_adapters(paper_root):
-    """Wave 3: proposer and dispatcher still cannot import backend.execution."""
-    roots = (paper_root / "baselines", paper_root / "adapters", paper_root / "proposer")
+    """Wave 3/4: proposer, dispatcher, and public package cannot import backend.execution."""
+    roots = (
+        paper_root / "baselines",
+        paper_root / "adapters",
+        paper_root / "proposer",
+        paper_root / "nwproposer",
+    )
     assert forbidden_imports_found(roots) == []
     assert "backend.execution" not in sys.modules
     with pytest.raises(ImportError):
@@ -39,13 +45,17 @@ def test_a1_scan_baselines_and_adapters(paper_root):
     assert_execution_not_loaded()
 
 
-def test_g_is_not_a_neuroclaw_wrap():
+def test_g_is_not_a_neuroclaw_wrap(arms):
     hits = forbidden_imports_found()
     claw = [hit for hit in hits if any(name in hit[1] for name in ("neuroclaw", "claw_shell", "neurodiscovery"))]
     assert claw == []
     source = (importlib.import_module("proposer.submit").__file__ or "")
     text = open(source, encoding="utf-8").read()
     assert "NeuroClaw" not in text or "not a NeuroClaw wrap" in text
+    assert arms["G"]["neuroclaw_wrap"] is False
+    assert arms["U"]["neuroclaw_wrap"] is False
+    assert arms["U"]["writer"] == "unconstrained_agent"
+    assert arms["U"]["gates"] == []
 
 
 def test_backend_execution_is_not_vendored():
@@ -60,6 +70,16 @@ def test_importing_proposer_does_not_load_executor():
     importlib.reload(importlib.import_module("proposer.submit"))
     for name in FORBIDDEN_MODULES:
         assert name not in sys.modules
+
+
+def test_proposer_init_does_not_import_submit(paper_root):
+    init = paper_root / "proposer" / "__init__.py"
+    names = imported_module_names(init)
+    assert "proposer.submit" not in names
+    assert "submit" not in names
+    import proposer
+
+    assert "submit" not in proposer.__all__
 
 
 def test_propose_and_submit_do_not_open_a_network_or_container():
