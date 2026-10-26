@@ -1,0 +1,18 @@
+# SciCap REJECT fixture: DK labels declared as DKT. G must not POST.
+proposer: agent
+plugin_id: fastsurfer
+plugin_version: "2.4.2"
+image_digest: "sha256:PENDING"
+inputs:
+  T1w: "bids:sub-01/anat/sub-01_T1w.nii.gz"
+  labels: "fixtures/dk_as_dkt/sub-01_atlas-DKT_dseg.json"
+parameters:
+  subject_id: sub-01
+  atlas_declared: DKT
+  atlas_actual: DesikanKilliany
+  illegal_family: dk_as_dkt
+backend: local_docker
+network: off
+approval:
+  execution: true
+workflow: false

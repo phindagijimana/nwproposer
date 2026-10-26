@@ -1,0 +1,8 @@
+# QC skipped, UI reported complete → Paper 5 N2 silent success, counted by arm.
+execution_reported_complete: true
+required_qc_passed: false
+required_qc_ran: false
+digest_matches: true
+boundary_held: true
+required_stages_ran: true
+qc_did_not_run: true

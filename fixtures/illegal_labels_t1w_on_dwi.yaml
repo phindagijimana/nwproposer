@@ -1,0 +1,23 @@
+# SciGuard FAIL fixture: T1w labels wired to DWI, no transform. G must not POST.
+proposer: agent
+plugin_id: map_labels_to_diffusion
+workflow: true
+workflow_id: map_labels_to_diffusion
+plugin_version: "0.1.0"
+image_digest: "sha256:PENDING"
+inputs:
+  labels:
+    kind: parcellation
+    atlas: DesikanKilliany
+    space: subject_T1w
+    value_type: discrete_labels
+  dwi:
+    kind: diffusion_reference
+    space: subject_DWI
+  transform: omitted
+parameters:
+  illegal_family: labels_t1w_on_dwi
+backend: local_docker
+network: off
+approval:
+  execution: true

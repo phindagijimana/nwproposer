@@ -1,0 +1,20 @@
+# Illustrative Paper 6 propose-request. Maps to neuroinsight_research/plugins/fastsurfer.yaml.
+# Not a production job. Digest must match the pin in the software repo.
+proposer: agent
+plugin_id: fastsurfer
+plugin_version: "2.4.2"
+image_digest: "sha256:PENDING"
+inputs:
+  T1w: "bids:sub-01/anat/sub-01_T1w.nii.gz"
+parameters:
+  subject_id: sub-01
+backend: local_docker
+network: off
+approval:
+  execution: true
+guards:
+  scicap_invoke: pending
+  sciguard_validate: not_applicable
+notes:
+  agent_may_not_execute: true
+  equality_mate: human_ui_fastsurfer_sub-01

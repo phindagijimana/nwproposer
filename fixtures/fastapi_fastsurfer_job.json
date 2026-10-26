@@ -1,0 +1,42 @@
+{
+  "contract": "inspected FastAPI job shape 2026-10-26",
+  "source": "hand_authored_not_cloned_private_repo",
+  "private_repo_cloned": false,
+  "note": "Plugin + docker/slurm + inputs. Equality is plugin_id, image_digest, inputs, backend, network. Not a dump of neuroinsight_research.",
+  "docker_job": {
+    "plugin": {
+      "id": "fastsurfer",
+      "version": "2.4.2",
+      "descriptor": "plugins/fastsurfer.yaml"
+    },
+    "image": {
+      "digest": "sha256:PENDING",
+      "container": "docker"
+    },
+    "backend": {
+      "kind": "docker"
+    },
+    "inputs": {
+      "T1w": "bids:sub-01/anat/sub-01_T1w.nii.gz"
+    },
+    "network": "off"
+  },
+  "slurm_job": {
+    "plugin": {
+      "id": "fastsurfer",
+      "version": "2.4.2",
+      "descriptor": "plugins/fastsurfer.yaml"
+    },
+    "image": {
+      "digest": "sha256:PENDING",
+      "container": "slurm"
+    },
+    "backend": {
+      "kind": "slurm"
+    },
+    "inputs": {
+      "T1w": "bids:sub-01/anat/sub-01_T1w.nii.gz"
+    },
+    "network": "off"
+  }
+}

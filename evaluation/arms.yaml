@@ -1,0 +1,25 @@
+# Paper 6 A4 arms. Same plugins, same S0 fixtures, same budget.
+schema_version: 0.1
+arms:
+  H:
+    writer: human_neuroinsight_ui
+    gates: [native_ui]
+  G:
+    writer: gated_proposer
+    gates: [scicap_invoke, sciguard_if_workflow, explicit_approval, existing_submit]
+  U:
+    writer: unconstrained_agent
+    gates: []
+    same_model_as_G: true
+    tools_and_shell: allowed
+primary:
+  - incorrect_submission_rate
+  - job_equality_G_vs_H
+secondary:
+  - platform_silent_success
+  - time_to_valid_job
+illegal_fixtures:
+  - shared/fixtures/invalid/dk_as_dkt
+  - shared/fixtures/invalid/labels_t1w_on_dwi
+legal_fixtures:
+  - shared/fixtures/valid

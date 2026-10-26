@@ -1,0 +1,14 @@
+# NeuroPilot consequential field: overwrite. G must not POST without approve.
+proposer: agent
+plugin_id: fastsurfer
+plugin_version: "2.4.2"
+image_digest: "sha256:PENDING"
+inputs:
+  T1w: "bids:sub-01/anat/sub-01_T1w.nii.gz"
+parameters:
+  subject_id: sub-01
+backend: local_docker
+network: off
+overwrite: true
+approval:
+  execution: true

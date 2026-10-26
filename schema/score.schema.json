@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://neuroinsight-agent.local/schemas/score.schema.json",
+  "title": "NeuroInsight Agent item score (A2–A4)",
+  "description": "Illustrative evaluation record. Not a frozen evaluation contract.",
+  "type": "object",
+  "required": [
+    "item_id",
+    "arm",
+    "posted",
+    "incorrect_submission",
+    "job_equal_to_human",
+    "platform_silent_success"
+  ],
+  "properties": {
+    "item_id": { "type": "string" },
+    "arm": { "type": "string", "enum": ["H", "G", "U"] },
+    "plugin_id": { "type": "string" },
+    "posted": {
+      "description": "Job was submitted to the existing NeuroInsight API",
+      "type": "boolean"
+    },
+    "scicap_decision": {
+      "type": "string",
+      "enum": ["ALLOW", "REJECT", "ABSTAIN", "not_run"]
+    },
+    "sciguard_status": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "UNKNOWN", "NEEDS_REVIEW", "not_applicable", "not_run"]
+    },
+    "incorrect_submission": {
+      "description": "Posted, and SciCap was REJECT/ABSTAIN or SciGuard was FAIL",
+      "type": "boolean"
+    },
+    "job_equal_to_human": {
+      "description": "Canonical job matches arm H on equality_fields; null if no H mate",
+      "type": ["boolean", "null"]
+    },
+    "platform_silent_success": { "type": "boolean" },
+    "scientific_valid_nab": {
+      "description": "Paper 3 score if evaluated; not this paper’s primary",
+      "type": ["boolean", "null"]
+    },
+    "time_to_valid_job_s": { "type": ["number", "null"] }
+  }
+}

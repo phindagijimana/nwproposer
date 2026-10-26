@@ -1,0 +1,38 @@
+# Paper 6 A1: the only object the proposer may emit.
+# Must map 1:1 onto neuroinsight_research's existing job submit (plugin or workflow).
+schema_version: 0.1
+propose_request:
+  proposer: agent
+  plugin_id: required          # e.g. fastsurfer — must exist in neuroinsight_research/plugins/
+  plugin_version: required
+  image_digest: required       # must match the plugin pin
+  inputs: required
+  parameters: {}
+  backend:
+    enum: [local_docker, remote_docker, slurm]
+  network: off
+  approval:
+    execution: required
+    consequential_requires_approve:
+      # NeuroPilot paper: escalate overwrite, delete, arrays, fallbacks.
+      - overwrite
+      - delete
+      - slurm_array
+      - backend_switch
+      - network_on
+      - fallback_plugin
+guards:
+  scicap_invoke: required      # ALLOW before submit; REJECT/ABSTAIN → do not submit
+  sciguard_validate: required_if_workflow
+  neuroagentbench_evaluate: after_run_optional
+forbidden:
+  - import backend.execution
+  - subprocess shell
+  - start container from proposer
+  - external_model_api_with_image_bytes
+equality_fields:
+  - plugin_id
+  - image_digest
+  - inputs
+  - backend
+  - network

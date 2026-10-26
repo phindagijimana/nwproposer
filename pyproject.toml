@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=65.5"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "neuroworkbench-proposer"
+version = "0.1.0"
+description = "Proposer-only adapter for NeuroWorkbench. No execute. No neuroinsight-agent command."
+license = { text = "Apache-2.0" }
+requires-python = ">=3.11"
+dependencies = [
+  "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+# No console script. Do not ship neuroinsight-agent.
+
+[tool.setuptools.packages.find]
+include = ["proposer*", "guards*", "adapters*", "baselines*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
