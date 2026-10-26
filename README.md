@@ -7,14 +7,11 @@ Pip: **`nwproposer`**. No CLI. No `neuroinsight-agent`.
 ## Go
 
 ```bash
-git clone https://github.com/phindagijimana/nwproposer.git
-cd nwproposer && pip install -e .
-python -c "from proposer.propose import propose; print('ok')"
+pip install git+https://github.com/phindagijimana/nwproposer.git
 ```
 
 ```python
-from proposer.propose import propose
-from proposer.submit import submit
+from nwproposer import propose, submit
 
 req = propose({
     "plugin_id": "fastsurfer",
@@ -23,15 +20,17 @@ req = propose({
     "inputs": {"t1w": "bids:sub-01/anat/sub-01_T1w.nii.gz"},
     "backend": "docker",
 })
-submit(req)  # blocked on SciCap REJECT, SciGuard FAIL, or missing approve
+submit(req, arm="G", approve=True)  # blocked on SciCap REJECT, SciGuard FAIL, or missing approve
 ```
 
 Python 3.11+. Does not vendor [neuroinsight_research](https://github.com/phindagijimana/neuroinsight_research). Not a NeuroClaw wrap.
 
+Agent hook: `from nwproposer.agent import call_tool` (propose / dry-run submit; no execute tool). No MCP — that is not this paper.
+
+Workbench: [`neuroworkbench`](https://github.com/phindagijimana/neuroworkbench).
+
 ```bash
 pytest tests
 ```
-
-Workbench: [`neuroworkbench`](https://github.com/phindagijimana/neuroworkbench).
 
 [Methods](docs/NeuroInsightAgent_Methods.md) · Apache-2.0
