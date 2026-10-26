@@ -4,7 +4,7 @@ Planning-stage correspondence · 26 October 2026 · no results claimed
 
 This traces locked methods A1–A5 onto the public protocol tools in `baselines/` and the Wave 1 research stubs. It does not replace [`NeuroInsightAgent_Methods.md`](NeuroInsightAgent_Methods.md). There is no A6. There is no MCP adapter (Coala owns CWL→MCP). There are no fabricated U-vs-G percentages.
 
-Residual: **job equality and incorrect-submission on this NeuroInsight job API.** Not a first agent workbench.
+Residual: **job equality and incorrect-submission on the public neuroworkbench job API.** Not a first agent workbench. Not `neuroinsight_research`.
 
 ---
 
@@ -16,7 +16,7 @@ Residual: **job equality and incorrect-submission on this NeuroInsight job API.*
 | A2 | existing job object (`adapters/neuroinsight/job.py`) | G equals H on plugin/digest/inputs/backend/network | `tests/test_a2_equality.py` |
 | A3 | SciCap/SciGuard sibling if importable, else `guard_mode: recorded` (`guards/`) | illegal not POSTed; U incorrect-submission > G (stub counts, not a result) | `tests/test_a3_illegal_not_posted.py` |
 | A4 | NeuroClaw as U only | H/G/U declared; G is not NeuroClaw | `tests/test_a1_no_execute.py` |
-| A5 | Papers 1–3 + Paper 5 | reuse invoke/validate/score; do not reimplement | imports (`guards/`, `proposer/score.py`) |
+| A5 | Papers 1–3 + Paper 5 | reuse invoke/validate/score; do not reimplement | `guards/`, `adapters/neuroworkbench/`, `proposer/evaluate.py` |
 
 Public protocol tests: `tests/test_public_protocol.py`. Same fixtures through both stacks: `tests/test_holistic.py`.
 

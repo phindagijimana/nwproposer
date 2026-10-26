@@ -1,33 +1,37 @@
 # nwproposer
 
-Writes the same job a human would submit. Does not execute.
+Writes the same job a human would submit to **neuroworkbench**. Does not execute.
 
-Pip: **`nwproposer`**. No CLI. No `neuroinsight-agent`.
+Pip: **`nwproposer`**. No CLI. No `neuroinsight-agent`. Separate from `neuroinsight_research`.
 
 ## Go
 
 ```bash
 pip install git+https://github.com/phindagijimana/nwproposer.git
+pip install git+https://github.com/phindagijimana/neuroworkbench.git
+pip install git+https://github.com/phindagijimana/scicap.git
+pip install git+https://github.com/phindagijimana/sciguard.git
 ```
 
 ```python
 from nwproposer import propose, submit
 
 req = propose({
-    "plugin_id": "fastsurfer",
-    "plugin_version": "1",
-    "image_digest": "sha256:…",
+    "plugin_id": "fastsurfer_anatomical",
+    "plugin_version": "0.1.0",
+    "image_digest": "sha256:PENDING",
     "inputs": {"t1w": "bids:sub-01/anat/sub-01_T1w.nii.gz"},
-    "backend": "docker",
+    "backend": "local_container",
+    "parameters": {"modality": "T1w", "space": "subject_native"},
 })
-submit(req, arm="G", approve=True)  # blocked on SciCap REJECT, SciGuard FAIL, or missing approve
+submit(req, arm="G", approve=True, kernel="workbench")
+# optional, recorded tree only:
+# from nwproposer import evaluate_recorded
 ```
 
-Python 3.11+. Does not vendor [neuroinsight_research](https://github.com/phindagijimana/neuroinsight_research). Not a NeuroClaw wrap.
+G is blocked on SciCap REJECT, SciGuard FAIL, or missing approve. U skips gates (incorrect_submission). H/G must match on plugin, digest, inputs, backend, network.
 
-Agent hook: `from nwproposer.agent import call_tool` (propose / dry-run submit; no execute tool). No MCP — that is not this paper.
-
-Workbench: [`neuroworkbench`](https://github.com/phindagijimana/neuroworkbench).
+Public tools: SciCap, SciGuard, neuroworkbench, NeuroPilot approval list, CyberNeuro Planner ≠ Dispatcher. Not a NeuroClaw wrap.
 
 ```bash
 pytest tests

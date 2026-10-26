@@ -2,11 +2,11 @@
 schema_version: 0.1
 arms:
   H:
-    writer: human_neuroinsight_ui
+    writer: human_neuroworkbench
     gates: [native_ui]
   G:
     writer: gated_proposer
-    gates: [scicap_invoke, sciguard_if_workflow, explicit_approval, existing_submit]
+    gates: [scicap_invoke, sciguard_if_workflow, explicit_approval, neuroworkbench_submit]
   U:
     writer: unconstrained_agent
     gates: []

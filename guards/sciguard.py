@@ -199,7 +199,7 @@ def validate(request: Mapping[str, Any]) -> str:
         return "not_applicable"
 
     sibling = _load_sibling_check()
-    if sibling is not None and _is_labels_to_dwi(request):
+    if sibling is not None:
         try:
             report = sibling(_request_to_workflow(request))
             status = _status_from_report(report) if isinstance(report, Mapping) else None

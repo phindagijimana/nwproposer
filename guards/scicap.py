@@ -98,13 +98,18 @@ def _instance_for_request(request: Mapping[str, Any]) -> dict[str, Any] | Path:
     inputs = request.get("inputs") or {}
     if _SHARED_DK_AS_DKT.is_file() and _is_dk_as_dkt(request):
         return _SHARED_DK_AS_DKT
+    space_omitted = bool(
+        parameters.get("space_omitted")
+        or parameters.get("illegal_family") == "missing_space"
+    )
     instance: dict[str, Any] = {
         "modality": parameters.get("modality") or "T1w",
-        "space": parameters.get("space") or "subject_native",
         "atlas": parameters.get("atlas_declared") or parameters.get("atlas"),
         "label_set": parameters.get("atlas_actual") or parameters.get("label_set"),
-        "path": inputs.get("labels") or inputs.get("T1w"),
+        "path": inputs.get("labels") or inputs.get("T1w") or inputs.get("t1w"),
     }
+    if not space_omitted:
+        instance["space"] = parameters.get("space") or "subject_native"
     return instance
 
 
@@ -124,10 +129,10 @@ def _recorded_invoke(request: Mapping[str, Any]) -> str:
 
 
 def invoke(request: Mapping[str, Any]) -> str:
-    """Return ALLOW / REJECT / ABSTAIN. Sets guard_mode to sibling or recorded."""
+    """Return ALLOW / REJECT / ABSTAIN. Prefer installed/public SciCap."""
     global _guard_mode
     sibling = _load_sibling_invoke()
-    if sibling is not None and _is_dk_as_dkt(request) and _SCICAP_CAPABILITY.is_file():
+    if sibling is not None and _SCICAP_CAPABILITY.is_file():
         try:
             result = sibling(_SCICAP_CAPABILITY, _instance_for_request(request))
             decision = str(result.get("decision", ""))

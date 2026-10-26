@@ -2,9 +2,9 @@
 
 Paper 6 protocol · 26 October 2026 · planning document, no results claimed
 
-This is the locked methods stack for turning the **existing** NeuroInsight workbench into an agentic proposer. It follows the limitations-to-methods filter. It reuses Papers 1–5. It is not a new workbench and not “first agentic neuroimaging.”
+This is the locked methods stack for a **proposer-only** agentic condition on the **public** neuroworkbench kernel. It follows the limitations-to-methods filter. It reuses Papers 1–5. It is not a new workbench, not a rewrite of `neuroinsight_research`, and not “first agentic neuroimaging.”
 
-Related documents: [limitations to methods](NeuroInsightAgent_Limitations_to_Methods.md) · [public prior art reuse](Public_Prior_Art_Reuse.md) · software: https://github.com/phindagijimana/neuroinsight_research (`git@github.com:phindagijimana/neuroinsight_research.git`)
+Related documents: [limitations to methods](NeuroInsightAgent_Limitations_to_Methods.md) · [public prior art reuse](Public_Prior_Art_Reuse.md) · kernel: [`neuroworkbench`](https://github.com/phindagijimana/neuroworkbench)
 
 SciCap owns contracts. SciGuard owns preflight. NeuroAgentBench owns artifact scoring. EvidenceGraph owns literature binding. NeuroInsight owns the kernel. Paper 6 owns **whether a proposer on that kernel matches the human path and does not raise incorrect submissions or silent success**.
 
@@ -14,13 +14,13 @@ NeuroClaw, CyberNeuro, and NeuroPilot already occupy agentic MRI workbenches. Ci
 
 ## 1. Scope
 
-**Question.** On the shipping NeuroInsight job API, does a proposer that can only write an approved job request — gated by SciCap and SciGuard — match the human path and avoid raising incorrect submissions or platform silent success versus an unconstrained agent?
+**Question.** On the public neuroworkbench job API, does a proposer that can only write an approved job request — gated by SciCap and SciGuard — match the human path and avoid raising incorrect submissions or platform silent success versus an unconstrained agent?
 
 **Unit.** One job request (plugin or workflow) × proposer ∈ {human, gated-agent, unconstrained-agent}.
 
-**Software.** Private repo `neuroinsight_research`: Electron desktop, FastAPI, YAML plugins, Docker/Slurm. Implementation of the adapter belongs in that repo (`agents/proposer/`). This folder is the research protocol.
+**Software.** This folder is the project. Kernel = public `neuroworkbench` (Paper 5). Gates = public `scicap` and `sciguard`. Protocol sources = NeuroPilot approval list, CyberNeuro Planner ≠ Dispatcher. NeuroClaw is arm **U** only and is not vendored. `neuroinsight_research` is a separate product and is not cloned here.
 
-**Non-scope.** Rewriting NeuroInsight. New capability contracts, preflight rules, oracles, or literature graphs. Clinical use. Sending image bytes to external model APIs. Autonomous science.
+**Non-scope.** Rewriting NeuroInsight. Implementing inside `neuroinsight_research`. New capability contracts, preflight rules, oracles, or literature graphs. Clinical use. Sending image bytes to external model APIs. Autonomous science.
 
 ---
 
@@ -30,7 +30,7 @@ These are the Paper 6 methods. They are not optional product features.
 
 ### A1. Proposer-only adapter
 
-Agent output = one YAML/JSON job request the current backend already understands (`plugin_id` / workflow id, inputs, parameters, backend, image digest). Submit goes through the existing FastAPI path. No shell, no direct `backend.execution` import, no container start from the proposer process.
+Agent output = one YAML/JSON job request the current backend already understands (`plugin_id` / workflow id, inputs, parameters, backend, image digest). Submit goes through public `neuroworkbench.submit` (dry-run). No shell, no direct `backend.execution` import, no container start from the proposer process.
 
 SciCap invoke is required before submit. SciGuard validate is required if the request is a multi-step workflow. REJECT / ABSTAIN / FAIL → do not POST.
 
@@ -62,8 +62,8 @@ Do not call (1) NeuroAgentBench false success. Paper 3 scores the artifact. Pape
 
 | Arm | Who writes the job | Gates |
 |---|---|---|
-| H | Human in the NeuroInsight UI | Native UI checks only |
-| G | Gated proposer (this paper) | SciCap + SciGuard + approval; then existing submit |
+| H | Human-authored neuroworkbench request | Native workbench checks only |
+| G | Gated proposer (this paper) | SciCap + SciGuard + approval; then `neuroworkbench.submit` |
 | U | Unconstrained agent (same model, tools/shell allowed) | None, or only “please be careful” |
 
 Same plugins, same S0 fixtures, same token/time budget. Paper 3 may score artifacts as a secondary table with a cross-reference.
@@ -76,7 +76,7 @@ Same plugins, same S0 fixtures, same token/time budget. Paper 3 may score artifa
 | `sciguard validate` | Paper 2 |
 | `neuroagentbench evaluate` | Paper 3 |
 | Optional EvidenceGraph `workflow_run` | Paper 4 |
-| Kernel, receipt, boundary, N2 | Paper 5 / git repo |
+| Kernel, receipt, boundary, N2 | Paper 5 `neuroworkbench` |
 
 ---
 
@@ -88,18 +88,18 @@ Same plugins, same S0 fixtures, same token/time budget. Paper 3 may score artifa
 | Example FastSurfer request | `schema/example_propose_fastsurfer.yaml` |
 | Item score | `schema/score.schema.json` |
 | Arm definitions | `evaluation/arms.yaml` |
-| Proposer (research stub) | `proposer/` — production code lives in the git repo |
-| Adapter notes | `adapters/neuroinsight/` |
-| Guard wiring | `guards/` |
+| Proposer | `proposer/` and public package `nwproposer` |
+| Workbench map | `adapters/neuroworkbench/` |
+| Inspected FastAPI shape (not the kernel) | `adapters/neuroinsight/` |
+| Guard wiring | `guards/` (calls public SciCap / SciGuard) |
 | Agent build spec | `AGENTS.md` |
 
-Interfaces (proposed; submit is in the private repo):
+Interfaces:
 
 ```text
-nia propose --intent "FastSurfer on sub-01 T1w" --out request.yaml
-nia guard request.yaml          # scicap + optional sciguard
-nia submit request.yaml --approve   # existing FastAPI only
-nia evaluate --arm G --run RUN_ID
+from nwproposer import propose, submit
+req = propose({...})
+submit(req, arm="G", approve=True, kernel="workbench")
 ```
 
 The proposer process must fail tests if it imports `backend.execution`.
@@ -186,7 +186,7 @@ Do not describe Paper 6 as any of the following:
 
 | Method | Location |
 |---|---|
-| A1 propose-request | `schema/propose_request.yaml` ; git repo `agents/proposer/` |
+| A1 propose-request | `schema/propose_request.yaml` ; `proposer/` ; `adapters/neuroworkbench/` |
 | A2 equality fields | `schema/propose_request.yaml` `equality_fields` |
 | A3 / A4 scores and arms | `schema/score.schema.json` ; `evaluation/arms.yaml` |
 | A5 library calls | `guards/` ; do not re-implement 1–4 |

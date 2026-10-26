@@ -1,7 +1,9 @@
 # nwproposer
 
-Call `from nwproposer import propose`. Write the same job a human would. Do not execute.
+Call `from nwproposer import propose`. Write the same job a human would send to neuroworkbench.
 
-No execute tool. Not a NeuroClaw wrap.
+`submit(..., arm="G", approve=True, kernel="workbench")` is fail-closed. Do not execute.
 
-Agent hook: `from nwproposer.agent import call_tool`. No MCP server.
+Optional after a recorded tree: `evaluate_recorded` (NeuroAgentBench owns that score).
+
+No execute tool. No MCP. Not a NeuroClaw wrap.

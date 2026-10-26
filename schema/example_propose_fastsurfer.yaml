@@ -1,4 +1,4 @@
-# Illustrative Paper 6 propose-request. Maps to neuroinsight_research/plugins/fastsurfer.yaml.
+# Illustrative Paper 6 propose-request. Maps to public neuroworkbench / inspected FastAPI shape.
 # Not a production job. Digest must match the pin in the software repo.
 proposer: agent
 plugin_id: fastsurfer

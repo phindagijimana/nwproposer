@@ -37,4 +37,5 @@ def item_score(
         "incorrect_submission": bool(posted and illegal),
         "job_equal_to_human": job_equal_to_human,
         "platform_silent_success": platform_silent_success(receipt or {}),
+        "scientific_valid_nab": (receipt or {}).get("scientific_valid"),
     }

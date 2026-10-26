@@ -17,7 +17,7 @@
     "arm": { "type": "string", "enum": ["H", "G", "U"] },
     "plugin_id": { "type": "string" },
     "posted": {
-      "description": "Job was submitted to the existing NeuroInsight API",
+      "description": "Job was handed to public neuroworkbench.submit (dry-run)",
       "type": "boolean"
     },
     "scicap_decision": {

@@ -1,7 +1,7 @@
-"""Dry-run submit through the existing job API only if G gates pass.
+"""Dry-run submit through the public neuroworkbench kernel only if G gates pass.
 
 Arm G is not a NeuroClaw wrap. Arm U is an unconstrained stub that skips gates.
-No HTTP is sent. The private neuroinsight_research repo is not imported.
+Kernel is neuroworkbench (Paper 5), not neuroinsight_research.
 """
 
 from __future__ import annotations
@@ -9,7 +9,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Mapping
 
+from pathlib import Path
+
 from adapters.neuroinsight.job import to_job_payload
+from adapters.neuroworkbench.request import workbench_available, workbench_submit
 from baselines.neuropilot_approval import review_approval
 from guards.scicap import guard_mode as scicap_guard_mode
 from guards.scicap import invoke as scicap_invoke
@@ -45,6 +48,8 @@ class SubmitResult:
     incorrect_submission: bool
     job: dict[str, Any] | None = None
     guard_mode: dict[str, str] = field(default_factory=dict)
+    workbench: dict[str, Any] | None = None
+    execute_called: bool = False
 
 
 def _illegal_for_score(scicap_decision: str, sciguard_status: str) -> bool:
@@ -61,12 +66,14 @@ def submit(
     arm: str,
     approve: bool = False,
     poster: PostRecorder | None = None,
+    kernel: str = "recorder",
+    store: Path | None = None,
 ) -> SubmitResult:
     """POST only on arm G when SciCap/SciGuard allow and approval is set.
 
     NeuroPilot consequential fields (network: on, overwrite, backend switch)
     still require the explicit approve flag. Arm U posts without gates.
-    Dry-run only.
+    kernel='workbench' uses public neuroworkbench.submit (dry-run).
     """
     assert_execution_not_loaded()
     assert_no_forbidden_imports()
@@ -132,15 +139,52 @@ def submit(
 
     job = to_job_payload(request, canonical=canonicalize(request))
     recorder.post(job)
+    workbench_result = None
+    execute_called = False
+    reason = "dry_run_existing_submit"
+    if kernel == "workbench":
+        if not workbench_available():
+            return SubmitResult(
+                arm=arm,
+                posted=False,
+                reason="workbench_unavailable",
+                scicap_decision=scicap_decision,
+                sciguard_status=sciguard_status,
+                incorrect_submission=False,
+                job=job,
+                guard_mode=modes,
+            )
+        workbench_result = workbench_submit(
+            request,
+            approve=approve,
+            store=store or Path(".nwproposer_store"),
+        )
+        execute_called = bool(workbench_result.get("execute_called"))
+        reason = "dry_run_neuroworkbench"
+        if workbench_result.get("status") == "rejected":
+            return SubmitResult(
+                arm=arm,
+                posted=False,
+                reason=str(workbench_result.get("reason") or "workbench_rejected"),
+                scicap_decision=scicap_decision,
+                sciguard_status=sciguard_status,
+                incorrect_submission=False,
+                job=job,
+                guard_mode=modes,
+                workbench=workbench_result,
+                execute_called=execute_called,
+            )
     return SubmitResult(
         arm=arm,
         posted=True,
-        reason="dry_run_existing_submit",
+        reason=reason,
         scicap_decision=scicap_decision,
         sciguard_status=sciguard_status,
         incorrect_submission=False,
         job=job,
         guard_mode=modes,
+        workbench=workbench_result,
+        execute_called=execute_called,
     )
 
 

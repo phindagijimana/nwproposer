@@ -28,6 +28,6 @@ def test_public_propose() -> None:
 def test_agent_tool_has_no_execute() -> None:
     via = call_tool("propose", INTENT)
     assert via["notes"]["agent_may_not_execute"] is True
-    assert {tool["name"] for tool in TOOLS} == {"propose", "submit"}
+    assert {tool["name"] for tool in TOOLS} == {"propose", "submit", "evaluate_recorded"}
     with pytest.raises(ValueError, match="execute"):
         call_tool("execute", {})

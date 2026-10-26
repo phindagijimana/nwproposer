@@ -1,0 +1,15 @@
+# Human job on the public neuroworkbench kernel (Paper 5 example).
+# Not a neuroinsight_research export.
+proposer: human
+plugin_id: fastsurfer_anatomical
+plugin_version: 0.1.0
+image_digest: "sha256:PENDING"
+inputs:
+  t1w: "bids:sub-01/anat/sub-01_T1w.nii.gz"
+parameters:
+  modality: T1w
+  space: subject_native
+backend: local_container
+network: off
+approval:
+  execution: true
