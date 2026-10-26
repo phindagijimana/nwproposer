@@ -1,20 +1,16 @@
-# NeuroWorkbench proposer
+# nwproposer
 
-Gated **proposer** for the workbench. Writes the same job a human would submit. Does not execute.
+Writes the same job a human would submit. Does not execute.
 
-Pip name: **`nwproposer`**. No console command. No `neuroinsight-agent`.
+Pip: **`nwproposer`**. No CLI. No `neuroinsight-agent`.
 
-The shipping UI remains [neuroinsight_research](https://github.com/phindagijimana/neuroinsight_research). This repo does not vendor it. G is not a NeuroClaw wrap.
-
-## Install
+## Go
 
 ```bash
-pip install -e .
+git clone https://github.com/phindagijimana/nwproposer.git
+cd nwproposer && pip install -e .
+python -c "from proposer.propose import propose; print('ok')"
 ```
-
-Python 3.11+. No model API required for the stubs.
-
-## Use
 
 ```python
 from proposer.propose import propose
@@ -27,21 +23,15 @@ req = propose({
     "inputs": {"t1w": "bids:sub-01/anat/sub-01_T1w.nii.gz"},
     "backend": "docker",
 })
-result = submit(req)  # not POSTed if SciCap REJECT, SciGuard FAIL, or no approve
+submit(req)  # blocked on SciCap REJECT, SciGuard FAIL, or missing approve
 ```
 
-Arms: **H** human UI, **G** this proposer, **U** unconstrained comparator.
-
-## Tests
+Python 3.11+. Does not vendor [neuroinsight_research](https://github.com/phindagijimana/neuroinsight_research). Not a NeuroClaw wrap.
 
 ```bash
 pytest tests
 ```
 
-## Docs
+Workbench: [`neuroworkbench`](https://github.com/phindagijimana/neuroworkbench).
 
-- [Methods](docs/NeuroInsightAgent_Methods.md) (A1–A5)
-- [Prior art reuse](docs/Public_Prior_Art_Reuse.md)
-- [Methods trace](docs/METHODS_TRACE.md)
-
-Apache-2.0.
+[Methods](docs/NeuroInsightAgent_Methods.md) · Apache-2.0
